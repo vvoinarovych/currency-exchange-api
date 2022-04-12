@@ -1,18 +1,15 @@
 package com.sda.currencyexchangeapi.model;
-
-
 import lombok.*;
-
 import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
+@Builder(setterPrefix = "with")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @ToString
-
 public class ExchangeRate {
 
     @Id
