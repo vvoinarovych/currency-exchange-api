@@ -5,6 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ExchangeRateRepo extends JpaRepository<ExchangeRate, Integer> {
-
+public interface ExchangeRateRepository extends JpaRepository<ExchangeRate, Integer> {
 }
