@@ -1,10 +1,12 @@
 package com.sda.currencyexchangeapi.model;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
 @Builder(setterPrefix = "with")
+@JsonIgnoreProperties(ignoreUnknown = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

@@ -1,5 +1,4 @@
 package com.sda.currencyexchangeapi.utils;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 

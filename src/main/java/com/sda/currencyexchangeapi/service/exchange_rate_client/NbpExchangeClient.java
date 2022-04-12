@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @Component("PLN")
 public class NbpExchangeClient implements ExchangeRateClient{
 
-    private final String CURRENT_EXCHANGE_RATES = "https://api.nbp.pl/api/exchangerates/rates/c/%s?format=json";
+    private final String CURRENT_EXCHANGE_RATES = "https://api.nbp.pl/api/exchangerates/rates/a/%s?format=json";
     @Override
     public ExchangeRate getCurrentExchangeRate(String base, String target) {
         ExchangeRate exchangeRate = null;
@@ -23,6 +23,7 @@ public class NbpExchangeClient implements ExchangeRateClient{
             URL url = new URL(String.format(CURRENT_EXCHANGE_RATES, target));
             ObjectNode node = new ObjectMapper().readValue(url, ObjectNode.class);
             exchangeRate = buildRate(node);
+            System.out.println(url);
         }catch (IOException e) {
             log.error(e);
         }
@@ -31,13 +32,8 @@ public class NbpExchangeClient implements ExchangeRateClient{
     }
 
     private ExchangeRate buildRate(ObjectNode node) {
-        Double ask = node.get("rates").get(0).get("ask").asDouble();
-        Double bid = node.get("rates").get(0).get("bid").asDouble();
-        Double average = (ask + bid)/2;
-        Double rate = Utility.round(average,4);
-
         return ExchangeRate.builder()
-                .withRate(rate)
+                .withRate(node.get("rates").get(0).get("mid").asDouble())
                 .withBaseCurrency("PLN")
                 .withTargetCurrency(node.get("code").asText())
                 .withEffectiveDate(LocalDate.parse(node.get("rates").get(0).get("effectiveDate").asText()))
