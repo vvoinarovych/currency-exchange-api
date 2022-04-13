@@ -3,6 +3,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.sda.currencyexchangeapi.model.ExchangeRate;
 import com.sda.currencyexchangeapi.rest.exception.ExchangeRateProcessingError;
+import com.sda.currencyexchangeapi.utils.Utility;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 import java.io.IOException;
@@ -23,6 +24,7 @@ public class ExchangeRateHostExchangeClient implements ExchangeRateClient {
             URL url = new URL(String.format(CURRENT_EXCHANGE_RATES, base, target));
             ObjectNode node = new ObjectMapper().readValue(url, ObjectNode.class);
             exchangeRate = buildRate(node, target);
+            log.info(url);
         }catch (IOException e) {
             throw new ExchangeRateProcessingError("Could not get data for chosen currencies");
         }
@@ -31,24 +33,27 @@ public class ExchangeRateHostExchangeClient implements ExchangeRateClient {
     }
 
     @Override
-    public ExchangeRate getHistoricalExchangeRate(String date, String base, String target) {
-        ExchangeRate exchangeRate = null;
+    public ExchangeRate getHistoricalExchangeRate( String base, String target, String date) {
+        ExchangeRate exchangeRate;
         try {
             URL url = new URL(String.format(HISTORICAL_EXCHANGE_RATES, date, base, target));
             ObjectNode node = new ObjectMapper().readValue(url, ObjectNode.class);
             exchangeRate = buildRate(node, target);
+            log.info(url);
         }catch (IOException e) {
-            log.error(e);
+            throw new ExchangeRateProcessingError("Could not get data for chosen currencies");
         }
         log.info("ExchangeRateHost client for Historical Data used");
         return exchangeRate;
     }
 
     private ExchangeRate buildRate(ObjectNode node, String target) {
+        double rate = node.get("rates").get(target.toUpperCase()).asDouble();
+        rate = Utility.round(rate,4);
         return ExchangeRate.builder()
                 .withBaseCurrency(node.get("base").asText())
                 .withTargetCurrency(target.toUpperCase())
-                .withRate(node.get("rates").get(target.toUpperCase()).asDouble())
+                .withRate(rate)
                 .withEffectiveDate(LocalDate.parse(node.get("date").asText()))
                 .build();
     }

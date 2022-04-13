@@ -33,14 +33,15 @@ public class NbpExchangeClient implements ExchangeRateClient{
 
     @Override
     public ExchangeRate getHistoricalExchangeRate(String base, String target, String date) {
-        ExchangeRate exchangeRate = null;
+        ExchangeRate exchangeRate;
         try {
             URL url = new URL(String.format(HISTORICAL_EXCHANGE_RATES, target, date));
             System.out.println(url);
             ObjectNode node = new ObjectMapper().readValue(url, ObjectNode.class);
             exchangeRate = buildRate(node, base);
+            log.info(url);
         }catch (IOException e) {
-            log.error(e);
+            throw new ExchangeRateProcessingError("NPB does not have data for that day(it could be holiday");
         }
         log.info("NBP Exchange client for Historical Data used");
         return exchangeRate;
