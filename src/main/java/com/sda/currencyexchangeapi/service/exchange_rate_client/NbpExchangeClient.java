@@ -15,6 +15,7 @@ import java.time.LocalDate;
 public class NbpExchangeClient implements ExchangeRateClient{
 
     private final String CURRENT_EXCHANGE_RATES = "https://api.nbp.pl/api/exchangerates/rates/a/%s?format=json";
+    private final String HISTORICAL_EXCHANGE_RATES = "https://api.nbp.pl/api/exchangerates/rates/a/%s/%s?format=json";
     @Override
     public ExchangeRate getCurrentExchangeRate(String base, String target) {
         ExchangeRate exchangeRate;
@@ -27,6 +28,21 @@ public class NbpExchangeClient implements ExchangeRateClient{
             throw new ExchangeRateProcessingError("Could not get data for chosen currencies");
         }
         log.info("NBP Exchange client used");
+        return exchangeRate;
+    }
+
+    @Override
+    public ExchangeRate getHistoricalExchangeRate(String base, String target, String date) {
+        ExchangeRate exchangeRate = null;
+        try {
+            URL url = new URL(String.format(HISTORICAL_EXCHANGE_RATES, target, date));
+            System.out.println(url);
+            ObjectNode node = new ObjectMapper().readValue(url, ObjectNode.class);
+            exchangeRate = buildRate(node, base);
+        }catch (IOException e) {
+            log.error(e);
+        }
+        log.info("NBP Exchange client for Historical Data used");
         return exchangeRate;
     }
 

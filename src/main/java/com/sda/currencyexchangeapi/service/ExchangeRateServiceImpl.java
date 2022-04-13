@@ -4,12 +4,15 @@ import com.sda.currencyexchangeapi.model.ExchangeRateDto;
 import com.sda.currencyexchangeapi.repo.ExchangeRateRepository;
 import com.sda.currencyexchangeapi.service.exchange_rate_client.ExchangeRateClient;
 import com.sda.currencyexchangeapi.utils.ExchangeRateMapper;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.Map;
 
+
 @Service
+@Log4j2
 public class ExchangeRateServiceImpl implements ExchangeRateService {
 
     private final ExchangeRateRepository exchangeRateRepository;
@@ -29,6 +32,16 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
         ExchangeRate exchangeRate = exchangeRateClientMap
                 .getOrDefault(baseCurrency.toUpperCase(), exchangeRateClientMap.get("WORLD"))
                 .getCurrentExchangeRate(baseCurrency, targetCurrency);
+        exchangeRateRepository.save(exchangeRate);
+        return exchangeRateMapper.toDto(exchangeRate);
+    }
+
+    @Override
+    @Transactional
+    public ExchangeRateDto getHistoricalExchangeRate(String baseCurrency, String targetCurrency, String data) {
+        ExchangeRate exchangeRate = exchangeRateClientMap
+                .getOrDefault(baseCurrency.toUpperCase(), exchangeRateClientMap.get("WORLD"))
+                .getHistoricalExchangeRate(baseCurrency, targetCurrency,data);
         exchangeRateRepository.save(exchangeRate);
         return exchangeRateMapper.toDto(exchangeRate);
     }
