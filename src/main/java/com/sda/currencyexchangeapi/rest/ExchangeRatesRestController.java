@@ -18,7 +18,7 @@ public class ExchangeRatesRestController {
     @GetMapping("/api/current")
     public ResponseEntity<ExchangeRateDto> getCurrentExchangeRate(@RequestParam("base") String base,
                                                                   @RequestParam("target") String target){
-        return ResponseEntity.ok().body(exchangeRateService.getCurrentExchangeRate(base,target));
+        return ResponseEntity.ok().body(exchangeRateService.getCurrentExchangeRate(base, target));
     }
 
     @GetMapping( "/api/hello")
