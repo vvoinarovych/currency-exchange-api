@@ -1,5 +1,5 @@
 package com.sda.currencyexchangeapi.controller;
-import com.sda.currencyexchangeapi.model.ExchangeRate;
+import com.sda.currencyexchangeapi.model.ExchangeRateDto;
 import com.sda.currencyexchangeapi.service.ExchangeRateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +16,8 @@ public class ExchangeRatesController {
     }
 
     @GetMapping("/api/current")
-    public ResponseEntity<ExchangeRate> testCall(@RequestParam("base") String base,
-                                                 @RequestParam("target") String target){
+    public ResponseEntity<ExchangeRateDto> testCall(@RequestParam("base") String base,
+                                                    @RequestParam("target") String target){
         return ResponseEntity.ok().body(exchangeRateService.getCurrentExchangeRate(base,target));
     }
 
