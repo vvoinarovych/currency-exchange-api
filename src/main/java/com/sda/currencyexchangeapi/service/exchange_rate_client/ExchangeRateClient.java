@@ -10,4 +10,5 @@ public interface ExchangeRateClient {
 
     ExchangeRate getCurrentExchangeRate(String base, String target);
 
+    ExchangeRate getHistoricalExchangeRate(String base, String target, String data);
 }

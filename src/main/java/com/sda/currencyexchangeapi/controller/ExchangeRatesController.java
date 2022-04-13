@@ -15,6 +15,7 @@ public class ExchangeRatesController {
         this.exchangeRateService = exchangeRateService;
     }
 
+
     @GetMapping("/api/current")
     public ResponseEntity<ExchangeRateDto> testCall(@RequestParam("base") String base,
                                                     @RequestParam("target") String target){
@@ -25,4 +26,16 @@ public class ExchangeRatesController {
     public ResponseEntity<String> hello(){
         return ResponseEntity.ok().body("hello");
     }
+
+
+    @GetMapping("/api/historic")
+    public ResponseEntity<ExchangeRateDto> testCall2(@RequestParam("base") String base,
+                                                     @RequestParam("target") String target,
+                                                     @RequestParam("date") String date)
+                                                     {
+        return ResponseEntity.ok().body(exchangeRateService.getHistoricalExchangeRate(date, base, target));
+    }
+
+
+
 }

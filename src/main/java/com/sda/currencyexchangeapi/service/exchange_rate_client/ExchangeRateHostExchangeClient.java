@@ -13,6 +13,7 @@ import java.time.LocalDate;
 public class ExchangeRateHostExchangeClient implements ExchangeRateClient {
 
     private final String CURRENT_EXCHANGE_RATES = "https://api.exchangerate.host/latest?base=%s&symbols=%s";
+    private final String HISTORICAL_EXCHANGE_RATES = "https://api.exchangerate.host/%s?base=%s&symbols=%s";
 
     @Override
     public ExchangeRate getCurrentExchangeRate(String base, String target) {
@@ -25,6 +26,20 @@ public class ExchangeRateHostExchangeClient implements ExchangeRateClient {
             log.error(e);
         }
         log.info("ExchangeRateHost client used");
+        return exchangeRate;
+    }
+
+    @Override
+    public ExchangeRate getHistoricalExchangeRate(String date, String base, String target) {
+        ExchangeRate exchangeRate = null;
+        try {
+            URL url = new URL(String.format(HISTORICAL_EXCHANGE_RATES, date, base, target));
+            ObjectNode node = new ObjectMapper().readValue(url, ObjectNode.class);
+            exchangeRate = buildRate(node, target);
+        }catch (IOException e) {
+            log.error(e);
+        }
+        log.info("ExchangeRateHost client for Historical Data used");
         return exchangeRate;
     }
 

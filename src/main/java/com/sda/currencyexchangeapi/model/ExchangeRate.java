@@ -16,6 +16,7 @@ public class ExchangeRate {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    //@Column(name="id", nullable = false)
     private Integer id;
 
     @Column(name="base_currency")
