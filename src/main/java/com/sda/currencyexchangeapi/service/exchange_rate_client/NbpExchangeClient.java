@@ -3,6 +3,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.sda.currencyexchangeapi.model.ExchangeRate;
 import com.sda.currencyexchangeapi.rest.exception.ExchangeRateProcessingError;
+import com.sda.currencyexchangeapi.utils.Utility;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 import java.io.IOException;
@@ -16,7 +17,7 @@ public class NbpExchangeClient implements ExchangeRateClient{
     private final String CURRENT_EXCHANGE_RATES = "https://api.nbp.pl/api/exchangerates/rates/a/%s?format=json";
     @Override
     public ExchangeRate getCurrentExchangeRate(String base, String target) {
-        ExchangeRate exchangeRate = null;
+        ExchangeRate exchangeRate;
         try {
             URL url = new URL(String.format(CURRENT_EXCHANGE_RATES, target));
             ObjectNode node = new ObjectMapper().readValue(url, ObjectNode.class);
@@ -30,8 +31,10 @@ public class NbpExchangeClient implements ExchangeRateClient{
     }
 
     private ExchangeRate buildRate(ObjectNode node, String base) {
+        double rate = node.get("rates").get(0).get("mid").asDouble();
+        rate = Utility.round((1/rate),4);
         return ExchangeRate.builder()
-                .withRate(node.get("rates").get(0).get("mid").asDouble())
+                .withRate(rate)
                 .withBaseCurrency(base.toUpperCase())
                 .withTargetCurrency(node.get("code").asText())
                 .withEffectiveDate(LocalDate.parse(node.get("rates").get(0).get("effectiveDate").asText()))

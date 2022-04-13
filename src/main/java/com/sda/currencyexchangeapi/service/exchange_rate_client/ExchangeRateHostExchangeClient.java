@@ -17,7 +17,7 @@ public class ExchangeRateHostExchangeClient implements ExchangeRateClient {
 
     @Override
     public ExchangeRate getCurrentExchangeRate(String base, String target) {
-        ExchangeRate exchangeRate = null;
+        ExchangeRate exchangeRate;
         try {
             URL url = new URL(String.format(CURRENT_EXCHANGE_RATES, base, target));
             ObjectNode node = new ObjectMapper().readValue(url, ObjectNode.class);
@@ -32,8 +32,8 @@ public class ExchangeRateHostExchangeClient implements ExchangeRateClient {
     private ExchangeRate buildRate(ObjectNode node, String target) {
         return ExchangeRate.builder()
                 .withBaseCurrency(node.get("base").asText())
-                .withTargetCurrency(target)
-                .withRate(node.get("rates").get(target).asDouble())
+                .withTargetCurrency(target.toUpperCase())
+                .withRate(node.get("rates").get(target.toUpperCase()).asDouble())
                 .withEffectiveDate(LocalDate.parse(node.get("date").asText()))
                 .build();
     }
