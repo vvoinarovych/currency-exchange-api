@@ -33,7 +33,7 @@ public class ExchangeRatesRestController {
                                                      @RequestParam("target") String target,
                                                      @RequestParam("date") String date)
                                                      {
-        return ResponseEntity.ok().body(exchangeRateService.getHistoricalExchangeRate(date, base, target));
+        return ResponseEntity.ok().body(exchangeRateService.getHistoricalExchangeRate( base, target, date));
     }
 
 
