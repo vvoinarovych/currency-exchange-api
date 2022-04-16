@@ -1,0 +1,64 @@
+# Currency Exchange REST api application
+
+API is supporting current and historical exchange rates data.
+
+
+## API Reference examples
+
+#### Get current exchange rate for base and target
+
+```http
+  GET /api/current/{base}&{target}
+```
+
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `base`    | `string` | **Required** base          |
+| `target`  | `string` | **Required** target        |
+
+#### Example
+```http
+http://localhost:8080/api/current/?base=PLN&target=GBP
+```
+#### JSON Result
+```json
+{
+  "rate":0.1785,
+  "date":"2022-04-15"
+}
+```
+
+#### Get historical exchange rate
+
+```http
+  GET /api/historic/{base}&{target}&{date}
+```
+
+| Parameter | Type     | Description                   |
+| :-------- | :------- | :-----------------------------|
+| `base`    | `string` | **Required**. base            |
+| `target`  | `string` | **Required**. target          |
+| `date`    | `string` | **Required**. date            |
+
+#### Example
+```http
+http://localhost:8080/api/historic?base=USD&target=GBP&date=2022-02-02
+```
+#### JSON Result
+```json
+{
+"rate":0.7373,
+"date":"2022-02-02"
+}
+```
+
+
+## Used Tech Stack
+
+Technnologies: Java, SpringBoot, postgres
+
+
+## Authors
+
+- [@valerivoinarovich](hhttps://github.com/vvoinarovych)
+- [@lukaszlewandowski](https://github.com/ukas87)
