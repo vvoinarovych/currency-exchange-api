@@ -12,46 +12,41 @@ import java.time.LocalDate;
 
 @Log4j2
 @Component("PLN")
-public class NbpExchangeClient implements ExchangeRateClient{
+public class NbpExchangeClient implements ExchangeRateClient {
 
     private final String CURRENT_EXCHANGE_RATES = "https://api.nbp.pl/api/exchangerates/rates/a/%s?format=json";
     private final String HISTORICAL_EXCHANGE_RATES = "https://api.nbp.pl/api/exchangerates/rates/a/%s/%s?format=json";
+
     @Override
     public ExchangeRate getCurrentExchangeRate(String base, String target) {
-        ExchangeRate exchangeRate;
         try {
             URL url = new URL(String.format(CURRENT_EXCHANGE_RATES, target));
-            ObjectNode node = new ObjectMapper().readValue(url, ObjectNode.class);
-            exchangeRate = buildRate(node, base);
-            log.info(url);
-        }catch (IOException e) {
+            ExchangeRate exchangeRate = buildRate(base, url);
+            log.info("NBP Exchange client  for Historical Data used, url: "+url);
+            return exchangeRate;
+        } catch (IOException e) {
             throw new ExchangeRateProcessingError("Could not get data for chosen currencies");
         }
-        log.info("NBP Exchange client used");
-        return exchangeRate;
     }
 
     @Override
     public ExchangeRate getHistoricalExchangeRate(String base, String target, String date) {
-        ExchangeRate exchangeRate;
         try {
             URL url = new URL(String.format(HISTORICAL_EXCHANGE_RATES, target, date));
-            System.out.println(url);
-            ObjectNode node = new ObjectMapper().readValue(url, ObjectNode.class);
-            exchangeRate = buildRate(node, base);
-            log.info(url);
-        }catch (IOException e) {
+            ExchangeRate exchangeRate = buildRate(base, url);
+            log.info("NBP Exchange client  for Historical Data used, url: "+url);
+            return exchangeRate;
+        } catch (IOException e) {
             throw new ExchangeRateProcessingError("NPB does not have data for that day(it could be holiday");
         }
-        log.info("NBP Exchange client for Historical Data used");
-        return exchangeRate;
     }
 
-    private ExchangeRate buildRate(ObjectNode node, String base) {
-        double rate = node.get("rates").get(0).get("mid").asDouble();
-        rate = Utility.round((1/rate),4);
+    private ExchangeRate buildRate(String base, URL url) throws IOException {
+
+        ObjectNode node = new ObjectMapper().readValue(url, ObjectNode.class);
+
         return ExchangeRate.builder()
-                .withRate(rate)
+                .withRate(Utility.round((1 / node.get("rates").get(0).get("mid").asDouble()), 4))
                 .withBaseCurrency(base.toUpperCase())
                 .withTargetCurrency(node.get("code").asText())
                 .withEffectiveDate(LocalDate.parse(node.get("rates").get(0).get("effectiveDate").asText()))
