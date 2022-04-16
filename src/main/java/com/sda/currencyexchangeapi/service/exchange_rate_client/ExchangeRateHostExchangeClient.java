@@ -11,7 +11,7 @@ import java.net.URL;
 import java.time.LocalDate;
 
 @Log4j2
-@Component("WORLD")
+@Component("DEFAULT")
 public class ExchangeRateHostExchangeClient implements ExchangeRateClient {
 
     private final String CURRENT_EXCHANGE_RATES = "https://api.exchangerate.host/latest?base=%s&symbols=%s";
@@ -19,44 +19,37 @@ public class ExchangeRateHostExchangeClient implements ExchangeRateClient {
 
     @Override
     public ExchangeRate getCurrentExchangeRate(String base, String target) {
-        ExchangeRate exchangeRate;
         try {
             URL url = new URL(String.format(CURRENT_EXCHANGE_RATES, base, target));
-            ObjectNode node = new ObjectMapper().readValue(url, ObjectNode.class);
-            exchangeRate = buildRate(node, target);
-            log.info(url);
+            ExchangeRate exchangeRate = buildRate(target, url);
+            log.info("ExchangeRateHost client used, url: " + url);
+            return exchangeRate;
         }catch (IOException e) {
             throw new ExchangeRateProcessingError("Could not get data for chosen currencies");
         }
-        log.info("ExchangeRateHost client used");
-        return exchangeRate;
     }
 
     @Override
     public ExchangeRate getHistoricalExchangeRate( String base, String target, String date) {
-        ExchangeRate exchangeRate;
         try {
             URL url = new URL(String.format(HISTORICAL_EXCHANGE_RATES, date, base, target));
-            ObjectNode node = new ObjectMapper().readValue(url, ObjectNode.class);
-            exchangeRate = buildRate(node, target);
-            log.info(url);
+            ExchangeRate exchangeRate = buildRate(target, url);
+            log.info("ExchangeRateHost client used, url: " + url);
+            return  exchangeRate;
         }catch (IOException e) {
             throw new ExchangeRateProcessingError("Could not get data for chosen currencies");
         }
-        log.info("ExchangeRateHost client for Historical Data used");
-        return exchangeRate;
     }
 
-    private ExchangeRate buildRate(ObjectNode node, String target) {
-        double rate = node.get("rates").get(target.toUpperCase()).asDouble();
-        rate = Utility.round(rate,4);
+    private ExchangeRate buildRate(String target, URL url) throws IOException {
+
+        ObjectNode node = new ObjectMapper().readValue(url, ObjectNode.class);
+
         return ExchangeRate.builder()
                 .withBaseCurrency(node.get("base").asText())
                 .withTargetCurrency(target.toUpperCase())
-                .withRate(rate)
+                .withRate(Utility.round(node.get("rates").get(target.toUpperCase()).asDouble(),4))
                 .withEffectiveDate(LocalDate.parse(node.get("date").asText()))
                 .build();
     }
-
-
 }
