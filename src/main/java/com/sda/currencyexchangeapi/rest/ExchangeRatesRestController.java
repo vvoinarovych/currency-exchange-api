@@ -1,4 +1,5 @@
 package com.sda.currencyexchangeapi.rest;
+
 import com.sda.currencyexchangeapi.model.ExchangeRateDto;
 import com.sda.currencyexchangeapi.service.ExchangeRateService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +22,12 @@ public class ExchangeRatesRestController {
 
     @GetMapping("/current/{base}/{target}")
     public ResponseEntity<ExchangeRateDto> getCurrentExchangeRate(@PathVariable(name = "base") String base,
-                                                                  @PathVariable(name = "target") String target){
+                                                                  @PathVariable(name = "target") String target) {
         return ResponseEntity.ok().body(exchangeRateService.getCurrentExchangeRate(base, target));
     }
 
-    @GetMapping( "/hello")
-    public ResponseEntity<String> hello(){
+    @GetMapping("/hello")
+    public ResponseEntity<String> hello() {
         return ResponseEntity.ok().body("hello");
     }
 
@@ -34,20 +35,20 @@ public class ExchangeRatesRestController {
     @GetMapping("/historic/{base}/{target}/{date}")
     public ResponseEntity<ExchangeRateDto> getHistoricExchangeRate(@PathVariable(name = "base") String base,
                                                                    @PathVariable(name = "target") String target,
-                                                                   @PathVariable(name = "date") String date)
-                                                     {
-        return ResponseEntity.ok().body(exchangeRateService.getHistoricalExchangeRate( base, target, date));
+                                                                   @PathVariable(name = "date") String date
+    ) {
+        return ResponseEntity.ok().body(exchangeRateService.getHistoricalExchangeRate(base, target, date));
     }
 
     @GetMapping("/between/{base}/{target}/{start}/{end}")
     public ResponseEntity<List<ExchangeRateDto>> getExchangeRatesBetweenDates(@PathVariable(name = "base") String base,
                                                                               @PathVariable(name = "target") String target,
                                                                               @PathVariable(name = "start") String start,
-                                                                              @PathVariable(name = "end") String end){
+                                                                              @PathVariable(name = "end") String end
+    ) {
 
         return ResponseEntity.ok().body(exchangeRateService.getTimeSeriesExchangeRate(base, target, start, end));
     }
-
 
 
 }

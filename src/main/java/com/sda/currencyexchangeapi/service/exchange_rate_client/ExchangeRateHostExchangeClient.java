@@ -24,7 +24,7 @@ public class ExchangeRateHostExchangeClient implements ExchangeRateClient {
             ExchangeRate exchangeRate = buildRate(target, url);
             log.info("ExchangeRateHost client used, url: " + url);
             return exchangeRate;
-        }catch (IOException e) {
+        }catch (Exception e) {
             throw new ExchangeRateProcessingError("Could not get data for chosen currencies");
         }
     }
@@ -36,7 +36,7 @@ public class ExchangeRateHostExchangeClient implements ExchangeRateClient {
             ExchangeRate exchangeRate = buildRate(target, url);
             log.info("ExchangeRateHost client used, url: " + url);
             return  exchangeRate;
-        }catch (IOException e) {
+        }catch (Exception e) {
             throw new ExchangeRateProcessingError("Could not get data for chosen currencies");
         }
     }
