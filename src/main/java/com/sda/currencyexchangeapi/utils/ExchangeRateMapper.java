@@ -8,6 +8,11 @@ import org.springframework.stereotype.Component;
 public class ExchangeRateMapper {
 
     public ExchangeRateDto toDto(ExchangeRate exchangeRate){
-        return new ExchangeRateDto(exchangeRate.getRate(), exchangeRate.getEffectiveDate());
+        return new ExchangeRateDto(
+                exchangeRate.getBaseCurrency(),
+                exchangeRate.getTargetCurrency(),
+                exchangeRate.getRate(),
+                exchangeRate.getEffectiveDate()
+        );
     }
 }
