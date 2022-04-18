@@ -1,5 +1,4 @@
 package com.sda.currencyexchangeapi.service;
-
 import com.sda.currencyexchangeapi.model.ExchangeRate;
 import com.sda.currencyexchangeapi.model.ExchangeRateDto;
 import com.sda.currencyexchangeapi.repo.ExchangeRateRepository;
@@ -8,7 +7,6 @@ import com.sda.currencyexchangeapi.utils.ExchangeRateMapper;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.Map;
@@ -55,16 +53,18 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
                     .getHistoricalExchangeRate(baseCurrency, targetCurrency, date);
             exchangeRateRepository.save(exchangeRate);
             return exchangeRateMapper.toDto(exchangeRate);
-        }else {
+        }
+        else {
             return exchangeRateMapper.toDto(exchangeRateFromDb);
         }
     }
 
     private ExchangeRateClient getExchangeRateClient(String baseCurrency) {
-        return exchangeRateClientMap.getOrDefault(baseCurrency.toUpperCase(), exchangeRateClientMap.get("WORLD"));
+        return exchangeRateClientMap.getOrDefault(baseCurrency.toUpperCase(), exchangeRateClientMap.get("DEFAULT"));
     }
 
     private ExchangeRate saveOrUpdate(ExchangeRate exchangeRate) {
+
         ExchangeRate result = exchangeRateRepository.findByBaseCurrencyAndTargetCurrencyAndEffectiveDate(
                 exchangeRate.getBaseCurrency(),
                 exchangeRate.getTargetCurrency(),
@@ -73,7 +73,8 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
 
         if (result == null) {
             exchangeRateRepository.save(exchangeRate);
-        } else {
+        }
+        else {
             result.setRate(exchangeRate.getRate());
             exchangeRateRepository.save(result);
         }
