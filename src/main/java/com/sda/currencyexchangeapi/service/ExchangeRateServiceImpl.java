@@ -66,6 +66,7 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
                 .sorted(Comparator.comparing(ExchangeRate::getEffectiveDate))
                 .map(exchangeRateMapper::toDto)
                 .collect(Collectors.toList());
+
         if(exchangeRateDtoList.isEmpty()){
             throw new ExchangeRateProcessingError("No data for that period");
         }
