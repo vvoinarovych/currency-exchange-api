@@ -41,6 +41,7 @@ public class NbpExchangeClient implements ExchangeRateClient {
     }
 
     private ExchangeRate buildRate(String base, ObjectNode node) {
+
         return ExchangeRate.builder()
                 .withRate(Utility.round((1 / node.get("rates").get(0).get("mid").asDouble()), 4))
                 .withBaseCurrency(base.toUpperCase())

@@ -1,4 +1,5 @@
 package com.sda.currencyexchangeapi.service.exchange_rate_client;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.sda.currencyexchangeapi.model.ExchangeRate;
@@ -6,6 +7,7 @@ import com.sda.currencyexchangeapi.rest.exception.ExchangeRateProcessingError;
 import com.sda.currencyexchangeapi.utils.Utility;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
@@ -41,12 +43,15 @@ public class ExchangeRateHostExchangeClient implements ExchangeRateClient {
     }
 
     private ExchangeRate buildRate(String target, ObjectNode node) {
-            return ExchangeRate.builder()
-                    .withBaseCurrency(node.get("base").asText())
-                    .withTargetCurrency(target.toUpperCase())
-                    .withRate(Utility.round(node.get("rates").get(target.toUpperCase()).asDouble(), 4))
-                    .withEffectiveDate(LocalDate.parse(node.get("date").asText()))
-                    .build();
+        if (!node.get("rates").hasNonNull(target.toUpperCase())) {
+            throw new ExchangeRateProcessingError("No such currency");
         }
+        return ExchangeRate.builder()
+                .withBaseCurrency(node.get("base").asText())
+                .withTargetCurrency(target.toUpperCase())
+                .withRate(Utility.round(node.get("rates").get(target.toUpperCase()).asDouble(), 4))
+                .withEffectiveDate(LocalDate.parse(node.get("date").asText()))
+                .build();
+    }
 
 }
