@@ -25,10 +25,12 @@ http://localhost:8080/api/current/PLN/GBP
 ```
 #### JSON Result
 ```json
-    {"base":"USD",
-    "target":"CHF",
-    "rate":0.9462,
-    "date":"2022-04-19"}
+{
+"base":"PLN",
+"target":"GBP",
+"rate":0.1785,
+"date":"2022-04-15"
+}
 ```
 
 #### Get historical exchange rate for a specific date
@@ -49,10 +51,12 @@ http://localhost:8080/api/historic/USD/GBP/2022-02-02
 ```
 #### JSON Result
 ```json
-{"base":"USD",
+{
+"base":"USD",
 "target":"GBP",
 "rate":0.7367,
-"date":"2022-02-22"}
+"date":"2022-02-22"
+}
 ```
 
 #### Get historical exchange rate for a range of dates
@@ -75,19 +79,22 @@ http://localhost:8080/api/between/USD/GBP/2022-02-23/2022-02-25
 #### JSON Result
 ```json
 [
-    {"base":"USD",
+    {
+    "base":"USD",
      "target":"GBP",
      "rate":0.7393,
      "date":"2022-02-23"
      },
 
-    {"base":"USD",
+    {
+    "base":"USD",
     "target":"GBP",
     "rate":0.7477,
     "date":"2022-02-24"
     },
 
-    {"base":"USD",
+    {
+    "base":"USD",
     "target":"GBP",
     "rate":0.7459,
     "date":"2022-02-25"
@@ -97,7 +104,7 @@ http://localhost:8080/api/between/USD/GBP/2022-02-23/2022-02-25
 
 ## Used Tech Stack
 
-Technnologies: Java, Spring Framework, database: PostgresSQL
+Technnologies: Java, Spring Framework, database: PostgresSQL, Swagger
 
 
 ## Authors
