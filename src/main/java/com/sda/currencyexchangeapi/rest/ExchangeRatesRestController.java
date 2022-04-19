@@ -26,12 +26,6 @@ public class ExchangeRatesRestController {
         return ResponseEntity.ok().body(exchangeRateService.getCurrentExchangeRate(base, target));
     }
 
-    @GetMapping("/hello")
-    public ResponseEntity<String> hello() {
-        return ResponseEntity.ok().body("hello");
-    }
-
-
     @GetMapping("/historic/{base}/{target}/{date}")
     public ResponseEntity<ExchangeRateDto> getHistoricExchangeRate(@PathVariable(name = "base") String base,
                                                                    @PathVariable(name = "target") String target,

@@ -1,14 +1,13 @@
 package com.sda.currencyexchangeapi.service;
-
 import com.sda.currencyexchangeapi.model.ExchangeRate;
 import com.sda.currencyexchangeapi.model.ExchangeRateDto;
 import com.sda.currencyexchangeapi.repo.ExchangeRateRepository;
+import com.sda.currencyexchangeapi.rest.exception.ExchangeRateProcessingError;
 import com.sda.currencyexchangeapi.service.exchange_rate_client.ExchangeRateClient;
 import com.sda.currencyexchangeapi.utils.ExchangeRateMapper;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.Comparator;
@@ -63,20 +62,25 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
         List<ExchangeRate> rates = exchangeRateRepository.findExchangeRatesByEffectiveDateBetweenAndBaseCurrencyAndTargetCurrency(
                 LocalDate.parse(startDate), LocalDate.parse(endDate), baseCurrency.toUpperCase(), targetCurrency.toUpperCase()
         );
-        return rates.stream()
+        List<ExchangeRateDto>  exchangeRateDtoList = rates.stream()
                 .sorted(Comparator.comparing(ExchangeRate::getEffectiveDate))
                 .map(exchangeRateMapper::toDto)
                 .collect(Collectors.toList());
+        if(exchangeRateDtoList.isEmpty()){
+            throw new ExchangeRateProcessingError("No data for that period");
+        }
+        return exchangeRateDtoList;
     }
-
     private ExchangeRateClient getExchangeRateClient(String baseCurrency) {
         return exchangeRateClientMap.getOrDefault(baseCurrency.toUpperCase(), exchangeRateClientMap.get("DEFAULT"));
     }
 
     private ExchangeRate saveOrUpdate(ExchangeRate exchangeRate) {
-
-        ExchangeRate result = exchangeRateRepository.findByBaseCurrencyAndTargetCurrencyAndEffectiveDate(exchangeRate.getBaseCurrency(), exchangeRate.getTargetCurrency(), exchangeRate.getEffectiveDate());
-
+        ExchangeRate result = exchangeRateRepository.findByBaseCurrencyAndTargetCurrencyAndEffectiveDate(
+                exchangeRate.getBaseCurrency(),
+                exchangeRate.getTargetCurrency(),
+                exchangeRate.getEffectiveDate()
+        );
         if (result == null) {
             exchangeRateRepository.save(exchangeRate);
         } else {
