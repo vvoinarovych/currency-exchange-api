@@ -72,11 +72,11 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
         }
         return exchangeRateDtoList;
     }
-    private ExchangeRateClient getExchangeRateClient(String baseCurrency) {
+    public ExchangeRateClient getExchangeRateClient(String baseCurrency) {
         return exchangeRateClientMap.getOrDefault(baseCurrency.toUpperCase(), exchangeRateClientMap.get("DEFAULT"));
     }
 
-    private ExchangeRate saveOrUpdate(ExchangeRate exchangeRate) {
+    public ExchangeRate saveOrUpdate(ExchangeRate exchangeRate) {
         ExchangeRate result = exchangeRateRepository.findByBaseCurrencyAndTargetCurrencyAndEffectiveDate(
                 exchangeRate.getBaseCurrency(),
                 exchangeRate.getTargetCurrency(),
