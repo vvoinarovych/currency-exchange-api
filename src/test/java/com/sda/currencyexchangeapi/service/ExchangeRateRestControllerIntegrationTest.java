@@ -1,4 +1,4 @@
-package com.sda.currencyexchangeapi;
+package com.sda.currencyexchangeapi.service;
 import com.sda.currencyexchangeapi.model.ExchangeRate;
 import com.sda.currencyexchangeapi.repo.ExchangeRateRepository;
 import org.junit.jupiter.api.*;

@@ -3,6 +3,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 @Builder(setterPrefix = "with")
@@ -29,4 +30,17 @@ public class ExchangeRate {
 
     @Column(name="effective_date")
     private LocalDate effectiveDate;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ExchangeRate that = (ExchangeRate) o;
+        return id.equals(that.id) && baseCurrency.equals(that.baseCurrency) && targetCurrency.equals(that.targetCurrency) && rate.equals(that.rate) && effectiveDate.equals(that.effectiveDate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, baseCurrency, targetCurrency, rate, effectiveDate);
+    }
 }
