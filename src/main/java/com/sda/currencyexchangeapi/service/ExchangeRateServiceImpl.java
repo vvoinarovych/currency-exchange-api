@@ -83,7 +83,8 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
                 exchangeRate.getEffectiveDate()
         );
         if (result == null) {
-            exchangeRateRepository.save(exchangeRate);
+            result = exchangeRate;
+            exchangeRateRepository.save(result);
         } else {
             result.setRate(exchangeRate.getRate());
             exchangeRateRepository.save(result);
