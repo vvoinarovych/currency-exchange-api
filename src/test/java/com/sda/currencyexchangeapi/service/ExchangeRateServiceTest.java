@@ -1,16 +1,18 @@
 package com.sda.currencyexchangeapi.service;
+
 import com.sda.currencyexchangeapi.model.ExchangeRate;
 import com.sda.currencyexchangeapi.model.ExchangeRateDto;
 import com.sda.currencyexchangeapi.repo.ExchangeRateRepository;
-import com.sda.currencyexchangeapi.service.ExchangeRateServiceImpl;
 import com.sda.currencyexchangeapi.service.exchange_rate_client.ExchangeRateClient;
 import com.sda.currencyexchangeapi.service.exchange_rate_client.ExchangeRateHostExchangeClient;
 import com.sda.currencyexchangeapi.utils.ExchangeRateMapper;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import java.time.LocalDate;
 import java.util.Map;
 
@@ -37,16 +39,29 @@ public class ExchangeRateServiceTest {
     @InjectMocks
     private ExchangeRateServiceImpl exchangeRateService;
 
+    private static ExchangeRate exchangeRate;
+    private static ExchangeRate exchangeRateFromDb;
 
-    @Test
-    void saveOrUpdateShouldWriteExchangeRateToDBIfNoRatesForThatDateAndCurrencies() {
-        ExchangeRate exchangeRate = ExchangeRate.builder()
+    @BeforeAll
+    static void init() {
+        exchangeRate = ExchangeRate.builder()
                 .withRate(5.22)
-                .withBaseCurrency("PLN")
-                .withTargetCurrency("EUR")
+                .withBaseCurrency("USD")
+                .withTargetCurrency("ZAR")
                 .withId(1)
                 .withEffectiveDate(LocalDate.parse("2020-05-10"))
                 .build();
+        exchangeRateFromDb = ExchangeRate.builder()
+                .withRate(9.22)
+                .withBaseCurrency("USD")
+                .withTargetCurrency("ZAR")
+                .withId(1)
+                .withEffectiveDate(LocalDate.parse("2020-05-10"))
+                .build();
+    }
+
+    @Test
+    void saveOrUpdateShouldWriteExchangeRateToDBIfNoRatesForThatDateAndCurrencies() {
         when(exchangeRateRepository.findByBaseCurrencyAndTargetCurrencyAndEffectiveDate(exchangeRate.getBaseCurrency(), exchangeRate.getTargetCurrency(), exchangeRate.getEffectiveDate())).thenReturn(null);
 
         ExchangeRate actual = exchangeRateService.saveOrUpdate(exchangeRate);
@@ -56,20 +71,6 @@ public class ExchangeRateServiceTest {
 
     @Test
     void saveOrUpdateShouldUpdateExchangeRateInDBIfThereIsRecordWithThatDateAndCurrency() {
-        ExchangeRate exchangeRate = ExchangeRate.builder()
-                .withRate(1.22)
-                .withBaseCurrency("USD")
-                .withTargetCurrency("ZAR")
-                .withId(1)
-                .withEffectiveDate(LocalDate.parse("1445-05-10"))
-                .build();
-        ExchangeRate exchangeRateFromDb = ExchangeRate.builder()
-                .withRate(9.22)
-                .withBaseCurrency("USD")
-                .withTargetCurrency("ZAR")
-                .withId(1)
-                .withEffectiveDate(LocalDate.parse("1445-05-10"))
-                .build();
         when(exchangeRateRepository.findByBaseCurrencyAndTargetCurrencyAndEffectiveDate(
                 exchangeRate.getBaseCurrency(),
                 exchangeRate.getTargetCurrency(),
@@ -83,39 +84,25 @@ public class ExchangeRateServiceTest {
     }
 
     @Test
-    void shouldSaveHistoricRateToDbIfNoSuchRecord(){
-        ExchangeRate exchangeRate = ExchangeRate.builder()
-                .withRate(11.1)
-                .withBaseCurrency("CHF")
-                .withTargetCurrency("PLN")
-                .withId(1)
-                .withEffectiveDate(LocalDate.parse("2007-05-10"))
-                .build();
-        ExchangeRateDto expected = new ExchangeRateDto(exchangeRate.getBaseCurrency(),exchangeRate.getTargetCurrency(),exchangeRate.getRate(),exchangeRate.getEffectiveDate());
-        when(exchangeRateRepository.findByBaseCurrencyAndTargetCurrencyAndEffectiveDate(anyString(),anyString(),any())).thenReturn(null);
+    void shouldSaveHistoricRateToDbIfNoSuchRecord() {
+        ExchangeRateDto expected = new ExchangeRateDto(exchangeRate.getBaseCurrency(), exchangeRate.getTargetCurrency(), exchangeRate.getRate(), exchangeRate.getEffectiveDate());
+        when(exchangeRateRepository.findByBaseCurrencyAndTargetCurrencyAndEffectiveDate(anyString(), anyString(), any())).thenReturn(null);
         when(mapper.toDto(exchangeRate)).thenReturn(expected);
-        when(exchangeRateClient.getHistoricalExchangeRate(anyString(),anyString(),any())).thenReturn(exchangeRate);
+        when(exchangeRateClient.getHistoricalExchangeRate(anyString(), anyString(), any())).thenReturn(exchangeRate);
         when(exchangeRateClientMap.getOrDefault(anyString(), any())).thenReturn(exchangeRateClient);
 
-        ExchangeRateDto actual = exchangeRateService.getHistoricalExchangeRate("CHF","PLN","2007-05-10");
+        ExchangeRateDto actual = exchangeRateService.getHistoricalExchangeRate("USD", "ZAR", "2020-05-10");
 
         assertThat(actual).isEqualTo(expected);
     }
 
     @Test
-    void shouldReturnFromDbIfSuchRecordExists(){
-        ExchangeRate exchangeRateFromDB = ExchangeRate.builder()
-                .withRate(11.1)
-                .withBaseCurrency("CHF")
-                .withTargetCurrency("PLN")
-                .withId(1)
-                .withEffectiveDate(LocalDate.parse("2007-05-10"))
-                .build();
-        ExchangeRateDto expected = new ExchangeRateDto(exchangeRateFromDB.getBaseCurrency(),exchangeRateFromDB.getTargetCurrency(),exchangeRateFromDB.getRate(),exchangeRateFromDB.getEffectiveDate());
-        when(exchangeRateRepository.findByBaseCurrencyAndTargetCurrencyAndEffectiveDate(anyString(),anyString(),any())).thenReturn(exchangeRateFromDB);
-        when(mapper.toDto(exchangeRateFromDB)).thenReturn(expected);
+    void shouldReturnFromDbIfSuchRecordExists() {
+        ExchangeRateDto expected = new ExchangeRateDto(exchangeRateFromDb.getBaseCurrency(), exchangeRateFromDb.getTargetCurrency(), exchangeRateFromDb.getRate(), exchangeRateFromDb.getEffectiveDate());
+        when(exchangeRateRepository.findByBaseCurrencyAndTargetCurrencyAndEffectiveDate(anyString(), anyString(), any())).thenReturn(exchangeRateFromDb);
+        when(mapper.toDto(exchangeRateFromDb)).thenReturn(expected);
 
-        ExchangeRateDto actual = exchangeRateService.getHistoricalExchangeRate("CHF","PLN","2007-05-10");
+        ExchangeRateDto actual = exchangeRateService.getHistoricalExchangeRate("USD", "ZAR", "2020-05-10");
 
         assertThat(actual).isEqualTo(expected);
     }
