@@ -40,7 +40,6 @@ public class ExchangeRatesRestController {
                                                                               @PathVariable(name = "start") String start,
                                                                               @PathVariable(name = "end") String end
     ) {
-
         return ResponseEntity.ok().body(exchangeRateService.getTimeSeriesExchangeRate(base, target, start, end));
     }
 
