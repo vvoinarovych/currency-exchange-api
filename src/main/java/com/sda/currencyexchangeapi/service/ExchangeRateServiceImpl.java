@@ -59,8 +59,16 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
 
     @Override
     public List<ExchangeRateDto> getTimeSeriesExchangeRate(String baseCurrency, String targetCurrency, String startDate, String endDate) {
+        LocalDate start = LocalDate.parse(startDate);
+        LocalDate end = LocalDate.parse(endDate);
+
+        if(start.isAfter(end)){
+            LocalDate temp = start;
+            start = end;
+            end = temp;
+        }
         List<ExchangeRate> rates = exchangeRateRepository.findExchangeRatesByEffectiveDateBetweenAndBaseCurrencyAndTargetCurrency(
-                LocalDate.parse(startDate), LocalDate.parse(endDate), baseCurrency.toUpperCase(), targetCurrency.toUpperCase()
+                start, end, baseCurrency.toUpperCase(), targetCurrency.toUpperCase()
         );
         List<ExchangeRateDto>  exchangeRateDtoList = rates.stream()
                 .sorted(Comparator.comparing(ExchangeRate::getEffectiveDate))
